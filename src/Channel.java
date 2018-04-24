@@ -2,7 +2,7 @@ public class Channel
 {
 	Channel()
 	{
-            m_State = null;
+            m_State = m_State.Free;
             m_Request = 0;
             m_Time = 0; 
 	}
