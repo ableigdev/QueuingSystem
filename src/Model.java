@@ -1,6 +1,11 @@
+import java.util.Vector;
+
+enum ChannelState { Free, Work, Lock }
+
 public class Model
 {
-    enum NumberSensor { SENSOR20_80, SENSOR50_150, SENSOR20_40, SENSOR40_80 } 
+    enum NumberSensor { SENSOR20_80, SENSOR50_150, SENSOR20_40, SENSOR40_80 }
+    
    
     public static void main(String[] args)
     {
@@ -20,37 +25,148 @@ public class Model
         StorageDevice storageDevice2 = new StorageDevice();
         StorageDevice storageDevice3 = new StorageDevice();
         
+        Vector<Channel> channel2 = new Vector();
+        channel2.add(channel21);
+        channel2.add(channel22);
+        
         int fullTime = 190;
         int currentTime = 0;
 
         NumberSensor numSensor = null;
         Sensors sen = new Sensors();
+        ChannelState state = null;
         
-        // 4. Моделирование выхода заявки из системы
-        if (channel4.getState() != 0)
+        channel1.addRequest(1, 60);
+        channel1.setState(state.Work);
+        
+        while (currentTime <= fullTime)
         {
-            if (currentTime <= fullTime)
+            // 4. Моделирование выхода заявки из системы
+            if (channel4.getState() != state.Free)
             {
-                int value = channel4.removeRequest();
-                
-                if (channel1.getState() == 0)
+                if (currentTime <= fullTime)
                 {
-                    int time = sen.sensor(numSensor.SENSOR20_80.ordinal());
-                    channel1.addRequest(value, time);
-                    channel1.setState(1);
-                    channel4.setState(0);
+                    int value = channel4.removeRequest();
+
+                    if (channel1.getState() == state.Free)
+                    {
+                        int time = sen.sensor(numSensor.SENSOR20_80.ordinal());
+                        channel1.addRequest(value, time);
+                        channel1.setState(state.Work);
+                        channel4.setState(state.Free);
+                        currentTime += time;
+                    }
+                    else
+                    {
+                        storageDevice1.addRequest(value);
+                    }
+                }
+            }
+
+            // 5. Моделирование перехода заявки из 3 фазы в 4 фазу
+            if (channel3.getState() != state.Free)
+            {
+                if (currentTime <= fullTime)
+                {
+                    if (channel4.getState() == state.Free)
+                    {
+                        int value = channel3.removeRequest();
+                        int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                        channel4.addRequest(value, time);
+                        channel4.setState(state.Work);
+                        channel3.setState(state.Free);
+                        currentTime += time;
+                    }
+                    else
+                    {
+                        channel3.setState(state.Lock);
+                    }
+                }
+            }
+
+            // 6. Обслуживание заявки в 3 фазе
+            if (storageDevice3.getSize() > 0)
+            {
+                if (channel3.getState() == state.Free)
+                {
+                    int value = storageDevice3.removeRequest();
+                    int time = sen.sensor(numSensor.SENSOR20_40.ordinal());
+                    channel3.addRequest(value, time);
+                    channel3.setState(state.Work);
                     currentTime += time;
                 }
-                else
+            }
+
+            // 7. Моделирование перехода из 2 в 3 фазу
+            for (int i = 0; i < channel2.size(); ++i)
+            {
+                if (channel2.get(i).getState() != state.Free)
                 {
-                    storageDevice1.addRequest(value);
+                    if (currentTime <= fullTime)
+                    {
+                        if (channel3.getState() == state.Free)
+                        {
+                            int value = channel2.get(i).removeRequest();
+                            int time = sen.sensor(numSensor.SENSOR20_40.ordinal());
+                            channel3.addRequest(value, time);
+                            channel3.setState(state.Work);
+                            channel2.get(i).setState(state.Free);
+                            currentTime += time;
+                        }
+                        else
+                        {
+                            storageDevice3.addRequest(channel2.get(i).removeRequest());
+                            channel2.get(i).setState(state.Free);
+                        }
+                    }
+                }
+            }
+
+            // 8. Обслуживание заявки во 2 фазе
+            if (storageDevice2.getSize() > 0)
+            {
+                for (int i = 0; i < channel2.size(); ++i)
+                {
+                    if (channel2.get(i).getState() == state.Free)
+                    {
+                        int value = storageDevice2.removeRequest();
+                        int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                        channel2.get(i).addRequest(value, time);
+                        channel2.get(i).setState(state.Work);
+                        currentTime += time;
+                    }
+                }
+            }
+
+            // 9. Моделирование перехода заявки из 1 во 2 фазу
+            if (channel1.getState() != state.Free)
+            {
+                if (currentTime <= fullTime)
+                {
+                    boolean flag = false;
+                    for (int i = 0; i < channel2.size(); ++i)
+                    {
+                        if (channel2.get(i).getState() == state.Free)
+                        {
+                            int value = channel1.removeRequest();
+                            int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                            channel2.get(i).addRequest(value, time);
+                            channel2.get(i).setState(state.Work);
+                            channel1.setState(state.Free);
+                            currentTime += time;
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (!flag)
+                    {
+                        storageDevice2.addRequest(channel1.removeRequest());
+                        channel1.setState(state.Free);
+                    }
                 }
             }
         }
-        
-        // 5. Моделирование перехода заявки из 3 фазы в 4 фазу
-        
-        
         
         
         
