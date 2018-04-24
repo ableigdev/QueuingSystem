@@ -2,7 +2,7 @@ public class Channel
 {
 	Channel()
 	{
-            m_State = 0;
+            m_State = null;
             m_Request = 0;
             m_Time = 0; 
 	}
@@ -29,12 +29,12 @@ public class Channel
             return m_Request;
 	}
 	
-        public void setState(int value)
+        public void setState(ChannelState value)
         {
-            m_State = value >= 0 && value <= 2 ? value : 0;
+            m_State = value;
         }
         
-	public int getState()
+	public ChannelState getState()
 	{
             return m_State;
 	}
@@ -47,7 +47,7 @@ public class Channel
             }
         }
 	
-	private int m_State;
+	private ChannelState m_State;
         private int m_Request;
         private int m_Time;
 }
