@@ -31,6 +31,7 @@ public class Model
         
         int fullTime = 190;
         int currentTime = 0;
+        int counterRequst = 0;
 
         NumberSensor numSensor = null;
         Sensors sen = new Sensors();
@@ -60,6 +61,8 @@ public class Model
                     {
                         storageDevice1.addRequest(value);
                     }
+                    System.out.println("Обработано заявок: " + ++counterRequst);
+                    currentTime = 0;
                 }
             }
 
@@ -71,7 +74,7 @@ public class Model
                     if (channel4.getState() == state.Free)
                     {
                         int value = channel3.removeRequest();
-                        int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                        int time = sen.sensor(numSensor.SENSOR40_80.ordinal());
                         channel4.addRequest(value, time);
                         channel4.setState(state.Work);
                         channel3.setState(state.Free);
