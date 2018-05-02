@@ -3,10 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/src/Model.java</file>
-            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/src/StorageDevice.java</file>
-            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/src/Sensors.java</file>
-            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/src/Channel.java</file>
+            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/QueuingSystem/src/Channel.java</file>
+            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/QueuingSystem/src/Request.java</file>
+            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/QueuingSystem/src/StorageDevice.java</file>
+            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/QueuingSystem/src/Sensors.java</file>
+            <file>file:/D:/Study/3%20course/Моделирование%20систем/Project/QueuingSystem/src/Model.java</file>
         </group>
     </open-files>
 </project-private>
