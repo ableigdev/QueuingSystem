@@ -32,13 +32,15 @@ public class Model
         int fullTime = 250;
         int currentTime = 0;
         int counterRequest = 0;
+        int fullTimeSystem = 0;
 
         NumberSensor numSensor = null;
         Sensors sen = new Sensors();
         ChannelState state = null;
-        
+       
         channel1.addRequest(1, 60);
         channel1.setState(state.Work);
+        ++counterRequest;       
         
         for (int z = 0; z < 100; ++z)
         {
@@ -51,7 +53,7 @@ public class Model
                     if (currentTime <= fullTime)
                     {
                         int value = channel4.removeRequest();
-                        System.out.println("Время обслуживание заявки: " + currentTime);
+                        fullTimeSystem += currentTime;
                         if (channel1.getState() == state.Free)
                         {
                             int time = sen.sensor(numSensor.SENSOR20_80.ordinal());
@@ -64,8 +66,7 @@ public class Model
                         {
                             storageDevice1.addRequest(value);
                         }
-                        System.out.println("Обработано заявок: " + ++counterRequest);
-                        System.out.println("Iter: " + z);
+                        ++counterRequest;
                         currentTime = 0;
                     }
                 }
@@ -177,23 +178,33 @@ public class Model
         
         }
         
-        System.out.println("Количество обработанных заявок: " + counterRequest);
-        System.out.println("Количество обработанныз заявок в 1-ом канале: " + channel1.getCounterRequest());
+        System.out.println("Количество обработанных заявок: " + counterRequest + "\n");
+        
+        System.out.println("Количество обработанных заявок в 1-ом канале: " + channel1.getCounterRequest());
         System.out.println("Среднее время обработки заявки в 1-ом канале: " + channel1.getFullTimeRequest() / channel1.getCounterRequest());
+        System.out.printf("Процент загруженности канала: %8.2f", (double)channel1.getFullTimeRequest() / fullTimeSystem * 100);
+        System.out.println("%\n");
         
         for (int i = 0; i < channel2.size(); ++i)
         {
-            System.out.println("Количество обработанныз заявок в 2-ом канале: " + channel2.get(i).getCounterRequest());
-            System.out.println("Среднее время обработки заявки в 2-ом канале: " + channel2.get(i).getFullTimeRequest() / channel1.getCounterRequest());
+            System.out.println("Количество обработанных заявок в канале (2, " + (i + 1) + "): " + channel2.get(i).getCounterRequest());
+            System.out.println("Среднее время обработки заявки в канале (2, " + (i + 1) + "): " + channel2.get(i).getFullTimeRequest() / channel1.getCounterRequest());
+            System.out.print("Процент загруженности канала (2, " + (i + 1) + "): ");
+            System.out.printf("%8.2f", (double)channel2.get(i).getFullTimeRequest() / fullTimeSystem * 100);
+            System.out.println("%");
         }
         
-        System.out.println("Количество обработанныз заявок в 3-ом канале: " + channel3.getCounterRequest());
+        System.out.println("\nКоличество обработанных заявок в 3-ом канале: " + channel3.getCounterRequest());
         System.out.println("Среднее время обработки заявки в 3-ом канале: " + channel3.getFullTimeRequest() / channel3.getCounterRequest());
+        System.out.printf("Процент загруженности канала: %8.2f", (double)channel3.getFullTimeRequest() / fullTimeSystem * 100);
+        System.out.println("%");
         
-        System.out.println("Количество обработанныз заявок в 4-ом канале: " + channel4.getCounterRequest());
+        System.out.println("\nКоличество обработанных заявок в 4-ом канале: " + channel4.getCounterRequest());
         System.out.println("Среднее время обработки заявки в 4-ом канале: " + channel4.getFullTimeRequest() / channel4.getCounterRequest());
+        System.out.printf("Процент загруженности канала: %8.2f", (double)channel4.getFullTimeRequest() / fullTimeSystem * 100);
+        System.out.println("%");
         
-        System.out.println("Количество заявок в 1 накопителе: " + storageDevice1.counterRequest());
+        System.out.println("\nКоличество заявок в 1 накопителе: " + storageDevice1.counterRequest());
         System.out.println("Количество заявок в 2 накопителе: " + storageDevice2.counterRequest());
         System.out.println("Количество заявок в 3 накопителе: " + storageDevice3.counterRequest());
     }
