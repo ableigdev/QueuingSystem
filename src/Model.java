@@ -9,12 +9,6 @@ public class Model
    
     public static void main(String[] args)
     {
-        /*
-        System.out.println(sen.sensor(numSensor.SENSOR20_80.ordinal()));
-        System.out.println(sen.sensor(numSensor.SENSOR50_150.ordinal()));
-        System.out.println(sen.sensor(numSensor.SENSOR20_40.ordinal()));
-        System.out.println(sen.sensor(numSensor.SENSOR40_80.ordinal()));        
-        */
         Channel channel1 = new Channel();
         Channel channel21 = new Channel();
         Channel channel22 = new Channel();
