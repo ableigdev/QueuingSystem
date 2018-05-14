@@ -1,4 +1,6 @@
 import java.util.Vector;
+import java.io.*;
+import java.math.*;
 
 enum ChannelState { Free, Work, Lock }
 
@@ -23,18 +25,61 @@ public class Model
         channel2.add(channel21);
         channel2.add(channel22);
         
-        int fullTime = 250;
+        int fullTime = 245;
         int currentTime = 0;
         int counterRequest = 0;
         int fullTimeSystem = 0;
 
         NumberSensor numSensor = null;
         Sensors sen = new Sensors();
-        ChannelState state = null;
-       
-        channel1.addRequest(1, 60);
-        channel1.setState(state.Work);
-        ++counterRequest;       
+        ChannelState state = null; 
+        WriteIntoFile writer = new WriteIntoFile();
+        WritelntoFile writer1 = new WritelntoFile();
+        
+        System.out.println("Выберите режим работы: ");
+        System.out.println("0 - Статический;\n1 - Случайный");
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int variant = 0;
+        try
+        {
+            String variantStr = reader.readLine();
+            
+            while (!variantStr.equals("0") && !variantStr.equals("1"))
+            {
+                System.out.println("Некорректный ввод!");
+                System.out.println("Выберите режим работы: ");
+                System.out.println("0 - Статический;\n1 - Случайный");
+                variantStr = reader.readLine();
+            }
+            
+            variant = Integer.parseInt(variantStr);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+            if (reader != null)
+                reader.close();
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        if (variant == 1)
+        {
+            Request firstRequest = new Request();
+            firstRequest.setTime(60);
+            channel1.addRequest(firstRequest, 60);
+            channel1.setState(state.Work);
+            ++counterRequest;
+        }
         
         for (int z = 0; z < 100; ++z)
         {
@@ -46,22 +91,32 @@ public class Model
                 {
                     if (currentTime <= fullTime)
                     {
-                        int value = channel4.removeRequest();
+                        Request value = channel4.removeRequest();
                         fullTimeSystem += currentTime;
-                        if (channel1.getState() == state.Free)
+                        if (variant == 1)
                         {
-                            int time = sen.sensor(numSensor.SENSOR20_80.ordinal());
-                            channel1.addRequest(value, time);
-                            channel1.setState(state.Work);
-                            channel4.setState(state.Free);
-                            currentTime += time;
+                            if (channel1.getState() == state.Free)
+                            {
+                                int time = sen.sensor(numSensor.SENSOR20_80.ordinal());
+                                value.setTime(0);
+                                value.updateTime(time);
+                                channel1.addRequest(value, time);
+                                channel1.setState(state.Work);
+                                channel4.setState(state.Free);
+                                currentTime += time;
+                            }
+                            else
+                            {
+                                storageDevice1.addRequest(value);
+                            }
+                            currentTime = 0;
                         }
                         else
                         {
-                            storageDevice1.addRequest(value);
+                            channel4.setState(state.Free);
                         }
                         ++counterRequest;
-                        currentTime = 0;
+                        
                     }
                 }
 
@@ -72,8 +127,9 @@ public class Model
                     {
                         if (channel4.getState() == state.Free)
                         {
-                            int value = channel3.removeRequest();
-                            int time = sen.sensor(numSensor.SENSOR40_80.ordinal());
+                            Request value = channel3.removeRequest();
+                            int time = variant == 1 ? sen.sensor(numSensor.SENSOR40_80.ordinal()) : 60;
+                            value.updateTime(time);
                             channel4.addRequest(value, time);
                             channel4.setState(state.Work);
                             channel3.setState(state.Free);
@@ -91,8 +147,9 @@ public class Model
                 {
                     if (channel3.getState() == state.Free)
                     {
-                        int value = storageDevice3.removeRequest();
-                        int time = sen.sensor(numSensor.SENSOR20_40.ordinal());
+                        Request value = storageDevice3.removeRequest();
+                        int time = variant == 1 ? sen.sensor(numSensor.SENSOR20_40.ordinal()) : 30;
+                        value.updateTime(time);
                         channel3.addRequest(value, time);
                         channel3.setState(state.Work);
                         currentTime += time;
@@ -108,8 +165,9 @@ public class Model
                         {
                             if (channel3.getState() == state.Free)
                             {
-                                int value = channel2.get(i).removeRequest();
-                                int time = sen.sensor(numSensor.SENSOR20_40.ordinal());
+                                Request value = channel2.get(i).removeRequest();
+                                int time = variant == 1 ? sen.sensor(numSensor.SENSOR20_40.ordinal()) : 30; 
+                                value.updateTime(time);
                                 channel3.addRequest(value, time);
                                 channel3.setState(state.Work);
                                 channel2.get(i).setState(state.Free);
@@ -131,8 +189,9 @@ public class Model
                     {
                         if (channel2.get(i).getState() == state.Free)
                         {
-                            int value = storageDevice2.removeRequest();
-                            int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                            Request value = storageDevice2.removeRequest();
+                            int time = variant == 1 ? sen.sensor(numSensor.SENSOR50_150.ordinal()) : 100;
+                            value.updateTime(time);
                             channel2.get(i).addRequest(value, time);
                             channel2.get(i).setState(state.Work);
                             currentTime += time;
@@ -150,8 +209,9 @@ public class Model
                         {
                             if (channel2.get(i).getState() == state.Free)
                             {
-                                int value = channel1.removeRequest();
-                                int time = sen.sensor(numSensor.SENSOR50_150.ordinal());
+                                Request value = channel1.removeRequest();
+                                int time = variant == 1 ? sen.sensor(numSensor.SENSOR50_150.ordinal()) : 100;
+                                value.updateTime(time);
                                 channel2.get(i).addRequest(value, time);
                                 channel2.get(i).setState(state.Work);
                                 channel1.setState(state.Free);
@@ -168,8 +228,25 @@ public class Model
                         }
                     }
                 }
+                
+                if (variant == 0)
+                {
+                    Request newRequest = new Request();
+                    newRequest.setTime(50);
+                    if (channel1.getState() == state.Free)
+                    {
+                        channel1.addRequest(newRequest, 50);
+                        channel1.setState(state.Work);
+                    }
+                    else
+                    {
+                        storageDevice1.addRequest(newRequest);
+                    }
+                }
             }
-        
+            
+            //System.out.println("Количество заявок в системе: " + Math.abs(counterRequest - channel1.getCounterRequest()));
+            writer1.write(Math.abs(counterRequest - channel1.getCounterRequest()));
         }
         
         System.out.println("Количество обработанных заявок: " + counterRequest + "\n");
