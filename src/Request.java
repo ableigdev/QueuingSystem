@@ -2,16 +2,16 @@ public class Request
 {
     Request()
     {
-        m_State = false;
+        m_State = ChannelState.Free;
         m_Time = 0;
     }
     
-    public void setState(boolean value)
+    public void setState(ChannelState value)
     {
         m_State = value;
     }
     
-    public boolean getState()
+    public ChannelState getState()
     {
         return m_State;
     }
@@ -31,6 +31,6 @@ public class Request
         m_Time += value;
     }
     
-    private boolean m_State;
+    private ChannelState m_State;
     private int m_Time;
 }
