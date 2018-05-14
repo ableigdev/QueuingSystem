@@ -3,13 +3,13 @@ public class Channel
 	Channel()
 	{
             m_State = m_State.Free;
-            m_Request = 0;
+            m_Request = null;
             m_Time = 0; 
             m_CounterRequest = 0;
             m_FullTimeRequest = 0;
 	}
 	
-	public void addRequest(int value, int time)
+	public void addRequest(Request value, int time)
 	{
             m_Request = value;
             setTime(time);
@@ -28,7 +28,7 @@ public class Channel
             return m_Time;
         }
 	
-	public int removeRequest()
+	public Request removeRequest()
 	{
             return m_Request;
 	}
@@ -62,7 +62,7 @@ public class Channel
         }
 	
 	private ChannelState m_State;
-        private int m_Request;
+        private Request m_Request;
         private int m_Time;
         private int m_CounterRequest;
         private int m_FullTimeRequest;

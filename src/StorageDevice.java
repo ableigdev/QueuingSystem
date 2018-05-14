@@ -8,13 +8,13 @@ public class StorageDevice
         m_CounterRequest = 0;
     }
 
-    public void addRequest(int value)
+    public void addRequest(Request value)
     {
         m_State.offer(value);
         m_CounterRequest = m_State.size() > m_CounterRequest ? m_State.size() : m_CounterRequest;
     }
 
-    public int removeRequest()
+    public Request removeRequest()
     {
         return m_State.remove();
     }
@@ -29,6 +29,6 @@ public class StorageDevice
         return m_CounterRequest;
     }
     
-    private Queue<Integer> m_State;
+    private Queue<Request> m_State;
     private int m_CounterRequest;
 }
