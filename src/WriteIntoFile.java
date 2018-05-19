@@ -4,21 +4,14 @@ public class WriteIntoFile
 {
     WriteIntoFile()
     {
-        try
-        {
-            m_File = new FileWriter("data.txt");
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        m_Writer = new BufferedWriter(m_File);
+        m_NameFile = "data.bin";
     }
     
     public void write(int value)
     {
-         try {
-            BufferedWriter bufferWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data.bin", true), "UTF-8"));
+         try 
+         {
+            BufferedWriter bufferWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(m_NameFile, true), "UTF-8"));
             bufferWriter.write(value);
             bufferWriter.write("\n");
             bufferWriter.close();
@@ -28,19 +21,5 @@ public class WriteIntoFile
         }
     }
     
-    public void close() throws IOException
-    {
-        if (m_File != null)
-        {
-            m_File.close();
-        }
-
-        if (m_Writer != null)
-        {
-            m_Writer.close();
-        }
-    }
-    
-    private FileWriter m_File;
-    private BufferedWriter m_Writer;
+    private String m_NameFile;
 }
